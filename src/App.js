@@ -4,6 +4,7 @@ import shortid from 'shortid';
 import Filter from "./components/filter/Filter";
 import ContactList from './components/ContactList/ContactList';
 
+
 class App extends Component {
   state = {
     contacts: [
@@ -14,10 +15,29 @@ class App extends Component {
     ],
     filter: "",
   };
+  addContact = ({name, number}) => {
+    const {contacts} = this.state;
+    const newCard = {id: shortid.generate(), name, number}
+    const searchCard = contacts.find(contact => contact.name === newCard.name)
+    if (searchCard) {
+      alert(`${name} is already in the contacts`);
+      return;
+    } else {
+      this.setState(({contacts}) => ({
+        contacts: [newCard, ...contacts],
+      }))
+    }
+    
+  }
 
   handleChange = (evt) => {
     this.setState({ [evt.target.name]: evt.target.value });
   };
+  handleSubmit = e => {
+    e.preventDefault();
+    this.addContact(this.state.name);
+    this.setState({name: ''})
+};
 
   getSubmitForm = ({ name, number }) => {
     const normalazedFind = name.toLowerCase();
@@ -39,26 +59,33 @@ class App extends Component {
       contacts: prevstate.contacts.filter((contact) => contact.id !== id),
     }));
   };
+  getVisibleContacts = () => {
+  const { filter, contacts} = this.state
+  const normalizedFilter = filter.toLowerCase();
+  return contacts.filter(contact => 
+    contact.name.toLowerCase().includes(normalizedFilter)
+    )
+}
 
   render() {
+    const visibleContacts = this.getVisibleContacts();
     return (
-      <div
-      value={{
-          contacts: this.state.contacts,
-          filter: this.state.filter,
-          onDeleteName: this.deleteName,
-        }}>
+   
         <div>
           <h2>Phonebook</h2>
-          <Form submitForm={this.getSubmitForm} />
-          <p>Contacts</p>
+          <Form onSubmit={this.addContact} />
+          <h2>Contacts</h2>
  
           <Filter handleChange={this.handleChange} filter={this.state.filter} />
-          <ContactList />
+          <ContactList 
+          contacts={visibleContacts}
+          onDeleteName={this.deleteName}
+          />
 </div>
- </div>
+//  </div>
     );
   }
 }
 
 export default App;
+

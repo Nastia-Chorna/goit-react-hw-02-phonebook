@@ -1,30 +1,40 @@
-import React  from 'react';
+import React from 'react';
+// import ContactWrap from '../ContactWrap/ContactWrap';
+import PropTypes from "prop-types";
 import {
-  Item, Button
-
+    List,
+    Button
+  
 } from "./ContactList.styled";
 
-const ContacsItem = () => {
-  return (
-    <div>
-      {({ filter, contacts, onDeleteName }) => {
-        const normalazedFilter = filter.toLowerCase();
-        const visibleContacts = contacts.filter((contact) =>
-          contact.name.toLowerCase().includes(normalazedFilter)
-        );
-        return visibleContacts.map(({ id, name, number }) => (
-          <Item key={id}>
-            <p>
-              {name} : {number}
-            </p>
-            <Button type="button" onClick={() => onDeleteName(id)}>
-              Delete
-            </Button>
-          </Item>
-        ));
-      }}
-    </div>
+const ContactList = ({ contacts, onDeleteName }) => {
+    return contacts.length === 0 ? (
+        <p>The phonebook is empty</p>
+    ) : (
+    <List>        
+        {contacts.map(({id, name, number}) => (
+            <li key={id}>
+               {name}: {number}
+          <Button
+            className="button"
+            type="button"
+            onClick={() => onDeleteName(id)}
+          >
+            Delete
+          </Button>
+        </li>
+      ))}
+    </List>
   );
 };
-
-export default ContacsItem;
+ContactList.propTypes= {
+    contacts: PropTypes.arrayOf(
+        PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            name: PropTypes.string.isRequired,
+            number: PropTypes.string.isRequired,
+        }).isRequired,
+    ),
+    onDeleteName: PropTypes.func.isRequired
+};
+export default ContactList;
